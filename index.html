@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
   <title>Medical Poster Presentation · Peer Review & Reflection Toolkit</title>
-  <!-- 引入html2pdf库用于PDF导出 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -181,9 +179,6 @@
       color: #1a3643;
       background: #f4f8fb;
     }
-    .score-cell {
-      background: #fafbfc;
-    }
 
     .score-input-group {
       display: flex;
@@ -221,7 +216,7 @@
 
     .grid-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.2rem;
       margin-top: 1.5rem;
     }
@@ -247,12 +242,19 @@
       font-size: 0.9rem;
       display: flex;
       gap: 0.5rem;
-      align-items: baseline;
+      align-items: flex-start;
     }
-    .question-list li::before {
-      content: "●";
+    .question-list li input[type="checkbox"] {
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+      accent-color: #2c5f6e;
+      width: 16px;
+      height: 16px;
+    }
+    .q-label {
+      font-weight: 600;
       color: #2c5f6e;
-      font-weight: bold;
+      min-width: 28px;
     }
 
     .reflection-box {
@@ -289,22 +291,25 @@
       margin-top: 1.5rem;
     }
 
-    /* 评分记录表 */
     .records-table {
       width: 100%;
       border-collapse: collapse;
       margin: 1rem 0;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
     .records-table th {
       background: #1e404e;
       color: white;
-      padding: 0.6rem 0.5rem;
+      padding: 0.6rem 0.4rem;
     }
     .records-table td {
-      padding: 0.5rem;
+      padding: 0.4rem;
       border-bottom: 1px solid #dee6ed;
       text-align: center;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .records-table tr:nth-child(even) td {
       background: #f9fbfd;
@@ -346,7 +351,7 @@
       <button onclick="exportToPDF()" class="btn btn-export">📄 Export PDF</button>
       <button onclick="saveRecord()" class="btn btn-record">💾 Save Record</button>
       <button onclick="window.print()" class="btn">🖨️ Print</button>
-      <button id="resetReflectionsBtn" class="btn">🗑️ Clear</button>
+      <button id="resetReflectionsBtn" class="btn">🗑️ Clear Reflections</button>
     </div>
   </div>
 
@@ -358,12 +363,11 @@
     <button class="tab" data-tab="records">📋 Saved Records</button>
   </div>
 
-  <!-- Panel 1: Rubric -->
+  <!-- ==================== Panel 1: Rubric ==================== -->
   <div id="rubric" class="panel active">
     <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">📌 Rapid Assessment Rubric (6 dimensions, 5 points each, total 30)</h2>
     <p style="color: #2d4b5e; margin-bottom: 0.8rem;"><strong>⭐ Delivery Basics: Eye contact, body language, and rhetorical devices</strong></p>
     
-    <!-- 评分输入区 -->
     <div class="score-input-group">
       <label>🎯 Hook & Structure:</label>
       <select id="score-hook"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
@@ -377,8 +381,8 @@
       <select id="score-engage"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
       <label>⚖️ Compliance:</label>
       <select id="score-compliance"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
-      <label>Student Name:</label>
-      <input type="text" id="student-name" placeholder="Enter name" style="width:150px;">
+      <label>Student:</label>
+      <input type="text" id="student-name" placeholder="Name" style="width:130px;">
       <span id="total-score-display" style="font-weight:700;color:#2c5f6e;"></span>
     </div>
 
@@ -395,45 +399,113 @@
         </tbody>
       </table>
     </div>
-    <div style="margin-top: 1rem;">
-      <label><strong>📝 Quick Notes:</strong></label>
-      <textarea id="quick-notes" placeholder="Observations on strengths, areas for improvement..." rows="2"></textarea>
-    </div>
+    <label><strong>📝 Quick Notes:</strong></label>
+    <textarea id="quick-notes" placeholder="Observations on strengths, areas for improvement..." rows="2"></textarea>
   </div>
 
-  <!-- Panel 2: Questions -->
+  <!-- ==================== Panel 2: Reflective Questions (编号系统) ==================== -->
   <div id="questions" class="panel">
     <h2 style="font-size: 1.5rem;">🔍 Reflective Q&A Prompt Bank</h2>
-    <p style="color:#2d4b5e;">Use during post-presentation Q&A or as peer review card prompts.</p>
+    <p style="color:#2d4b5e;">☑️ Check questions asked. <strong>Use codes (e.g., A1, B3) in notes below</strong> to record responses efficiently.</p>
     <div class="grid-cards">
-      <div class="card"><h3>🖼️ Visual & Structure</h3><ul class="question-list"><li>If you could keep only one figure, which would it be and why?</li><li>When viewed as a thumbnail, what information is recognized first?</li><li>Where does the eye land in the first 5 seconds? Does it match your intention?</li></ul></div>
-      <div class="card"><h3>📖 Scientific Narrative</h3><ul class="question-list"><li>Are you telling a detective story or submitting a lab report?</li><li>If an editor asked you to highlight a secondary finding, how would you reorganize?</li><li>Is your conclusion based on data or on interpretation? Is the boundary clear?</li></ul></div>
-      <div class="card"><h3>🗣️ Oral Translation</h3><ul class="question-list"><li>Whose understanding did your preview change? Was that your intended audience?</li><li>How would you explain the value of this study to a patient's family in one sentence?</li><li>Did your pace change when explaining complex figures? Intentional or nerves?</li></ul></div>
-      <div class="card"><h3>🤝 Engagement & Adaptability</h3><ul class="question-list"><li>Did any question make you feel challenged? How did you respond internally?</li><li>If the audience asked about conclusion B instead of A, what does that reveal?</li><li>Was there a moment you wanted to interrupt? What does that impulse tell you?</li></ul></div>
-      <div class="card"><h3>🎭 Delivery Reflection</h3><ul class="question-list"><li>Where did your gaze predominantly rest? How did the audience react?</li><li>Did your gestures reinforce the message or distract from it?</li><li>Which rhetorical device (analogy, repetition, etc.) was most effective?</li></ul></div>
+      <div class="card">
+        <h3><span class="badge">A</span> 🖼️ Visual & Structure</h3>
+        <ul class="question-list">
+          <li><input type="checkbox" class="q-checkbox" data-question="A1: If you could keep only one figure, which would it be and why?"><span class="q-label">A1.</span> If you could keep only one figure, which would it be and why?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="A2: When viewed as a thumbnail, what information is recognized first?"><span class="q-label">A2.</span> When viewed as a thumbnail, what information is recognized first?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="A3: Where does the eye land in the first 5 seconds? Does it match your intention?"><span class="q-label">A3.</span> Where does the eye land in the first 5 seconds? Does it match your intention?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="A4: Is the reading flow (left-to-right, top-to-bottom) intuitive or forced?"><span class="q-label">A4.</span> Is the reading flow (left-to-right, top-to-bottom) intuitive or forced?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="A5: What visual element could be removed without losing scientific meaning?"><span class="q-label">A5.</span> What visual element could be removed without losing scientific meaning?</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="badge">B</span> 📖 Scientific Narrative</h3>
+        <ul class="question-list">
+          <li><input type="checkbox" class="q-checkbox" data-question="B1: Are you telling a detective story or submitting a lab report?"><span class="q-label">B1.</span> Are you telling a detective story or submitting a lab report?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="B2: If an editor asked you to highlight a secondary finding, how would you reorganize?"><span class="q-label">B2.</span> If an editor asked you to highlight a secondary finding, how would you reorganize?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="B3: Is your conclusion based on data or on interpretation? Is the boundary clear?"><span class="q-label">B3.</span> Is your conclusion based on data or on interpretation? Is the boundary clear?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="B4: What is the single most important 'take-home message' you want the audience to remember?"><span class="q-label">B4.</span> What is the single most important "take-home message" you want the audience to remember?</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="badge">C</span> 🗣️ Oral Translation</h3>
+        <ul class="question-list">
+          <li><input type="checkbox" class="q-checkbox" data-question="C1: Whose understanding did your preview change? Was that your intended audience?"><span class="q-label">C1.</span> Whose understanding did your preview change? Was that your intended audience?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="C2: How would you explain the value of this study to a patient's family in one sentence?"><span class="q-label">C2.</span> How would you explain the value of this study to a patient's family in one sentence?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="C3: Did your pace change when explaining complex figures? Intentional or nerves?"><span class="q-label">C3.</span> Did your pace change when explaining complex figures? Intentional or nerves?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="C4: Did you use any signposting language (e.g., 'The key finding here is...')?"><span class="q-label">C4.</span> Did you use any signposting language (e.g., "The key finding here is...")?</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="badge">D</span> 🤝 Engagement & Adaptability</h3>
+        <ul class="question-list">
+          <li><input type="checkbox" class="q-checkbox" data-question="D1: Did any question make you feel challenged? How did you respond internally?"><span class="q-label">D1.</span> Did any question make you feel challenged? How did you respond internally?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="D2: If the audience asked about conclusion B instead of A, what does that reveal?"><span class="q-label">D2.</span> If the audience asked about conclusion B instead of A, what does that reveal?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="D3: Was there a moment you wanted to interrupt? What does that impulse tell you?"><span class="q-label">D3.</span> Was there a moment you wanted to interrupt? What does that impulse tell you?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="D4: How did you handle a question you didn't know the answer to?"><span class="q-label">D4.</span> How did you handle a question you didn't know the answer to?</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="badge">E</span> 🎭 Delivery Reflection</h3>
+        <ul class="question-list">
+          <li><input type="checkbox" class="q-checkbox" data-question="E1: Where did your gaze predominantly rest? How did the audience react?"><span class="q-label">E1.</span> Where did your gaze predominantly rest? How did the audience react?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="E2: Did your gestures reinforce the message or distract from it?"><span class="q-label">E2.</span> Did your gestures reinforce the message or distract from it?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="E3: Which rhetorical device (analogy, repetition, etc.) was most effective?"><span class="q-label">E3.</span> Which rhetorical device (analogy, repetition, etc.) was most effective?</li>
+          <li><input type="checkbox" class="q-checkbox" data-question="E4: If you watched a silent video of your presentation, what would you notice first?"><span class="q-label">E4.</span> If you watched a silent video of your presentation, what would you notice first?</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 新增：Q&A备注区 -->
+    <div style="margin-top: 1.5rem; background: #f5f8fb; border-radius: 1rem; padding: 1.2rem; border:1px solid #dde5ef;">
+      <h3 style="margin-bottom: 0.5rem;">📝 Q&A Observation Notes</h3>
+      <p style="font-size:0.85rem; color:#4a6275; margin-bottom:0.5rem;">
+        <strong>Pro tip:</strong> Use question codes to record responses quickly.<br>
+        <em>Example: "A2: Noticed title first. B1: Said 'detective story'. D4: Admitted not knowing, offered to follow up. E2: Hands were shaky initially."</em>
+      </p>
+      <textarea id="qa-notes" placeholder="Record key observations from the Q&A session using codes (A1, B3, etc.)..." rows="4"></textarea>
     </div>
   </div>
 
-  <!-- Panel 3: Instructor Feedback -->
+  <!-- ==================== Panel 3: Instructor Feedback (保持不变) ==================== -->
   <div id="interaction" class="panel">
     <h2 style="font-size: 1.5rem;">🧭 Instructor Feedback Entry Points & Operations</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1rem;">
-      <div class="card"><h3>📱 Concept Correction</h3><p><span class="badge">Action</span> Photograph the poster with a phone and shrink to screen size to test core visibility.</p></div>
-      <div class="card"><h3>🏷️ Title Intervention</h3><p><span class="badge">Contrast</span> Descriptive title vs. conclusion-driven title; rewrite on the spot.</p></div>
-      <div class="card"><h3>👁️ Visual Clinic</h3><p><span class="badge">Eye Exam</span> Project the poster; have the back row identify the smallest font size.</p></div>
-      <div class="card"><h3>🎙️ Oral Polishing</h3><p><span class="badge">Drill</span> Point to the figure with the laser pointer while simultaneously explaining its meaning.</p></div>
-      <div class="card"><h3>🛡️ Defensive Responding</h3><p><span class="badge">Phrasing</span> "If I understand correctly, you are asking..." — model academic dialogue.</p></div>
-      <div class="card"><h3>🎭 Delivery Intervention</h3><p><span class="badge">Eye Contact</span> Assign three audience members in different zones.<br><span class="badge">Body</span> Record video; review with sound off.</p></div>
+    <p style="color:#2d4b5e; margin-bottom:1rem;">☑️ Check strategies you applied during this feedback session.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; margin-top: 1rem;">
+      <div class="card">
+        <h3><input type="checkbox" class="feedback-checkbox" data-strategy="Concept Correction - Phone thumbnail test"> 📱 Concept Correction</h3>
+        <p><span class="badge">Action</span> Photograph the poster with a phone and shrink to screen size to test core visibility.</p>
+      </div>
+      <div class="card">
+        <h3><input type="checkbox" class="feedback-checkbox" data-strategy="Title Intervention - Rewrite on the spot"> 🏷️ Title Intervention</h3>
+        <p><span class="badge">Contrast</span> Descriptive title vs. conclusion-driven title; rewrite on the spot.</p>
+      </div>
+      <div class="card">
+        <h3><input type="checkbox" class="feedback-checkbox" data-strategy="Visual Clinic - Back row font test"> 👁️ Visual Clinic</h3>
+        <p><span class="badge">Eye Exam</span> Project the poster; have the back row identify the smallest font size.</p>
+      </div>
+      <div class="card">
+        <h3><input type="checkbox" class="feedback-checkbox" data-strategy="Oral Polishing - Pointer + explanation drill"> 🎙️ Oral Polishing</h3>
+        <p><span class="badge">Drill</span> Point to the figure with the laser pointer while simultaneously explaining its meaning.</p>
+      </div>
+      <div class="card">
+        <h3><input type="checkbox" class="feedback-checkbox" data-strategy="Defensive Responding - Model academic dialogue"> 🛡️ Defensive Responding</h3>
+        <p><span class="badge">Phrasing</span> "If I understand correctly, you are asking..." — model academic dialogue.</p>
+      </div>
+      <div class="card">
+        <h3><input type="checkbox" class="feedback-checkbox" data-strategy="Delivery Intervention - Eye contact zones & silent video review"> 🎭 Delivery Intervention</h3>
+        <p><span class="badge">Eye Contact</span> Assign three audience members in different zones.<br><span class="badge">Body</span> Record video; review with sound off.</p>
+      </div>
     </div>
     <div style="margin-top: 1.8rem; background: #f5f8fb; border-radius: 1rem; padding: 1.2rem; border:1px solid #dde5ef;">
-      <h3 style="margin-bottom: 0.5rem;">📋 In-Class Feedback Notes</h3>
-      <textarea id="instructor-notes" placeholder="Record instructor observations..." rows="3"></textarea>
+      <h3 style="margin-bottom: 0.5rem;">📋 Instructor Feedback Notes</h3>
+      <textarea id="instructor-notes" placeholder="Record detailed observations and suggestions..." rows="3"></textarea>
     </div>
   </div>
 
-  <!-- Panel 4: Reflection -->
+  <!-- ==================== Panel 4: Post-Session Reflection (保持不变) ==================== -->
   <div id="reflection" class="panel">
     <h2 style="font-size: 1.5rem;">✍️ Post-Session Reflection</h2>
+    <p style="color:#2d4b5e; margin-bottom:0.5rem;">Each time you click <strong>"Save Reflections"</strong>, a new entry is added (not overwritten).</p>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 0.5rem;">
       <div class="reflection-box">
         <h3>🧑‍🎓 Student Reflection</h3>
@@ -455,28 +527,34 @@
       </div>
     </div>
     <div style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
-      <button id="saveReflectionsBtn" class="btn-primary">💾 Save Reflections (Local)</button>
-      <span style="font-size:0.8rem; color:#4a5c69;">Saved in browser only. No data uploaded.</span>
+      <button id="saveReflectionsBtn" class="btn-primary">💾 Save Reflections (Append)</button>
+      <span style="font-size:0.8rem; color:#4a5c69;">Each click adds a new entry to the records.</span>
+    </div>
+    <div style="margin-top: 1.5rem;">
+      <h3>📋 Saved Reflection Entries</h3>
+      <div id="reflection-records" style="max-height:300px;overflow-y:auto;background:#f9fbfd;border-radius:0.8rem;padding:1rem;border:1px solid #dde5ef;">
+        <p style="color:#8a9aa8;">No reflections saved yet.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Panel 5: Saved Records -->
+  <!-- ==================== Panel 5: Saved Records (保持不变) ==================== -->
   <div id="records" class="panel">
     <h2 style="font-size: 1.5rem;">📋 Saved Assessment Records</h2>
-    <p style="color:#2d4b5e; margin-bottom:1rem;">Each record includes rubric scores, notes, and a timestamp.</p>
+    <p style="color:#2d4b5e; margin-bottom:1rem;">Includes rubric scores, checked questions, feedback strategies, and Q&A notes.</p>
     <div style="overflow-x: auto;">
       <table class="records-table" id="records-table">
         <thead>
           <tr>
-            <th>Date/Time</th><th>Student</th><th>Hook</th><th>Visual</th><th>Oral</th><th>Delivery</th><th>Engage</th><th>Compliance</th><th>Total</th><th>Notes</th><th>Action</th>
+            <th>Date/Time</th><th>Student</th><th>Hook</th><th>Visual</th><th>Oral</th><th>Delivery</th><th>Engage</th><th>Compliance</th><th>Total</th><th>Questions Asked</th><th>Feedback Strategies</th><th>Notes</th><th>Action</th>
           </tr>
         </thead>
         <tbody id="records-tbody">
-          <tr><td colspan="11" style="text-align:center;color:#8a9aa8;">No records saved yet. Use "Save Record" on the Rubric tab.</td></tr>
+          <tr><td colspan="13" style="text-align:center;color:#8a9aa8;">No records saved yet. Use "Save Record" on the Rubric tab.</td></tr>
         </tbody>
       </table>
     </div>
-    <div style="margin-top:1rem; display:flex; gap:1rem;">
+    <div style="margin-top:1rem; display:flex; gap:1rem; flex-wrap:wrap;">
       <button onclick="exportRecordsToCSV()" class="btn btn-primary">📥 Export All Records (CSV)</button>
       <button onclick="clearAllRecords()" class="btn">🗑️ Clear All Records</button>
     </div>
@@ -532,6 +610,18 @@
       setTimeout(() => { notif.style.display = 'none'; }, duration);
     }
 
+    // ============ 获取勾选的提问 ============
+    function getCheckedQuestions() {
+      const checkboxes = document.querySelectorAll('.q-checkbox:checked');
+      return Array.from(checkboxes).map(cb => cb.getAttribute('data-question'));
+    }
+
+    // ============ 获取勾选的反馈策略 ============
+    function getCheckedFeedbackStrategies() {
+      const checkboxes = document.querySelectorAll('.feedback-checkbox:checked');
+      return Array.from(checkboxes).map(cb => cb.getAttribute('data-strategy'));
+    }
+
     // ============ 保存评分记录 ============
     function saveRecord() {
       const studentName = document.getElementById('student-name').value.trim() || 'Unnamed';
@@ -540,9 +630,18 @@
         scores[id] = document.getElementById(id).value || '-';
       });
       const total = totalDisplay.textContent.replace('Total: ', '').split(' ')[0] || '-';
-      const notes = document.getElementById('quick-notes').value.trim();
+      const quickNotes = document.getElementById('quick-notes').value.trim();
       const instructorNotes = document.getElementById('instructor-notes').value.trim();
-      const allNotes = [notes, instructorNotes ? `[Instructor: ${instructorNotes}]` : ''].filter(Boolean).join(' | ');
+      const qaNotes = document.getElementById('qa-notes').value.trim();
+      
+      const checkedQuestions = getCheckedQuestions();
+      const checkedStrategies = getCheckedFeedbackStrategies();
+      
+      const allNotes = [
+        quickNotes,
+        instructorNotes ? `[Instructor: ${instructorNotes}]` : '',
+        qaNotes ? `[Q&A: ${qaNotes}]` : ''
+      ].filter(Boolean).join(' | ');
       
       const record = {
         datetime: new Date().toLocaleString(),
@@ -554,6 +653,8 @@
         engage: scores['score-engage'],
         compliance: scores['score-compliance'],
         total: total,
+        questions: checkedQuestions.join('; ') || '-',
+        strategies: checkedStrategies.join('; ') || '-',
         notes: allNotes
       };
       
@@ -561,7 +662,7 @@
       records.push(record);
       localStorage.setItem('poster_records', JSON.stringify(records));
       
-      showNotification('✅ Assessment record saved successfully!');
+      showNotification('✅ Assessment record saved! Questions & strategies included.');
       renderRecordsTable();
       
       // 清空输入
@@ -569,7 +670,9 @@
       document.getElementById('student-name').value = '';
       document.getElementById('quick-notes').value = '';
       document.getElementById('instructor-notes').value = '';
+      document.getElementById('qa-notes').value = '';
       totalDisplay.textContent = '';
+      document.querySelectorAll('.q-checkbox:checked, .feedback-checkbox:checked').forEach(cb => cb.checked = false);
     }
 
     // ============ 渲染记录表格 ============
@@ -577,7 +680,7 @@
       const records = JSON.parse(localStorage.getItem('poster_records') || '[]');
       const tbody = document.getElementById('records-tbody');
       if (records.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#8a9aa8;">No records saved yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#8a9aa8;">No records saved yet.</td></tr>';
         return;
       }
       tbody.innerHTML = records.map((r, index) => `
@@ -591,8 +694,10 @@
           <td>${r.engage}</td>
           <td>${r.compliance}</td>
           <td><strong>${r.total}</strong></td>
-          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.notes}">${r.notes || '-'}</td>
-          <td><button onclick="deleteRecord(${index})" style="padding:0.3rem 0.6rem;font-size:0.75rem;">🗑️</button></td>
+          <td title="${r.questions || ''}">${(r.questions || '-').length > 25 ? (r.questions || '-').substring(0,25)+'...' : (r.questions || '-')}</td>
+          <td title="${r.strategies || ''}">${(r.strategies || '-').length > 25 ? (r.strategies || '-').substring(0,25)+'...' : (r.strategies || '-')}</td>
+          <td title="${r.notes || ''}">${(r.notes || '-').length > 20 ? (r.notes || '-').substring(0,20)+'...' : (r.notes || '-')}</td>
+          <td><button onclick="deleteRecord(${index})" style="padding:0.2rem 0.5rem;font-size:0.7rem;">🗑️</button></td>
         </tr>
       `).reverse().join('');
     }
@@ -621,18 +726,21 @@
         showNotification('No records to export.');
         return;
       }
-      const headers = ['DateTime', 'Student', 'Hook', 'Visual', 'Oral', 'Delivery', 'Engagement', 'Compliance', 'Total', 'Notes'];
+      const headers = ['DateTime', 'Student', 'Hook', 'Visual', 'Oral', 'Delivery', 'Engagement', 'Compliance', 'Total', 'Questions Asked', 'Feedback Strategies', 'Notes'];
       const csvContent = [headers.join(',')];
       records.forEach(r => {
         csvContent.push([
-          `"${r.datetime}"`, `"${r.student}"`, r.hook, r.visual, r.oral, r.delivery, r.engage, r.compliance, r.total, `"${(r.notes || '').replace(/"/g, '""')}"`
+          `"${r.datetime}"`, `"${r.student}"`, r.hook, r.visual, r.oral, r.delivery, r.engage, r.compliance, r.total,
+          `"${(r.questions || '').replace(/"/g, '""')}"`,
+          `"${(r.strategies || '').replace(/"/g, '""')}"`,
+          `"${(r.notes || '').replace(/"/g, '""')}"`
         ].join(','));
       });
       const blob = new Blob([csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `poster-assessment-records-${new Date().toISOString().slice(0,10)}.csv`;
+      link.download = `poster-assessment-${new Date().toISOString().slice(0,10)}.csv`;
       link.click();
       URL.revokeObjectURL(url);
       showNotification('📥 CSV exported!');
@@ -650,48 +758,95 @@
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
       html2pdf().set(opt).from(element).save().then(() => {
-        showNotification('📄 PDF exported successfully!');
+        showNotification('📄 PDF exported!');
       });
     };
 
-    // ============ 反思保存 ============
-    const reflectionIds = ['student1', 'student2', 'student3', 'teacher1', 'teacher2', 'teacher3'];
-    function loadReflections() {
-      reflectionIds.forEach(id => {
-        const saved = localStorage.getItem('poster_en_reflect_' + id);
-        if (saved !== null) {
-          const textarea = document.getElementById(id);
-          if (textarea) textarea.value = saved;
-        }
+    // ============ 反思叠加保存 ============
+    function saveReflectionsAppend() {
+      const studentData = {
+        q1: document.getElementById('student1').value.trim(),
+        q2: document.getElementById('student2').value.trim(),
+        q3: document.getElementById('student3').value.trim()
+      };
+      const teacherData = {
+        q1: document.getElementById('teacher1').value.trim(),
+        q2: document.getElementById('teacher2').value.trim(),
+        q3: document.getElementById('teacher3').value.trim()
+      };
+      
+      if (!studentData.q1 && !studentData.q2 && !studentData.q3 && 
+          !teacherData.q1 && !teacherData.q2 && !teacherData.q3) {
+        showNotification('⚠️ Please write something before saving.');
+        return;
+      }
+      
+      const entry = {
+        datetime: new Date().toLocaleString(),
+        student: studentData,
+        teacher: teacherData
+      };
+      
+      let reflections = JSON.parse(localStorage.getItem('poster_reflections_list') || '[]');
+      reflections.push(entry);
+      localStorage.setItem('poster_reflections_list', JSON.stringify(reflections));
+      
+      showNotification('✅ Reflection entry added!');
+      renderReflectionRecords();
+      
+      ['student1','student2','student3','teacher1','teacher2','teacher3'].forEach(id => {
+        document.getElementById(id).value = '';
       });
     }
-    function saveReflections() {
-      reflectionIds.forEach(id => {
-        const textarea = document.getElementById(id);
-        if (textarea) localStorage.setItem('poster_en_reflect_' + id, textarea.value);
-      });
-      showNotification('✅ Reflections saved to browser.');
+
+    function renderReflectionRecords() {
+      const reflections = JSON.parse(localStorage.getItem('poster_reflections_list') || '[]');
+      const container = document.getElementById('reflection-records');
+      if (reflections.length === 0) {
+        container.innerHTML = '<p style="color:#8a9aa8;">No reflections saved yet.</p>';
+        return;
+      }
+      container.innerHTML = reflections.map((r, i) => `
+        <div style="border-bottom:1px solid #dde5ef;padding:0.8rem 0;">
+          <strong>📅 ${r.datetime}</strong>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-top:0.3rem;">
+            <div><em>Student:</em><br>${r.student.q1 || '-'}<br>${r.student.q2 || '-'}<br>${r.student.q3 || '-'}</div>
+            <div><em>Instructor:</em><br>${r.teacher.q1 || '-'}<br>${r.teacher.q2 || '-'}<br>${r.teacher.q3 || '-'}</div>
+          </div>
+          <button onclick="deleteReflection(${i})" style="margin-top:0.3rem;padding:0.2rem 0.5rem;font-size:0.7rem;">🗑️ Delete</button>
+        </div>
+      `).reverse().join('');
     }
+
+    window.deleteReflection = function(index) {
+      let reflections = JSON.parse(localStorage.getItem('poster_reflections_list') || '[]');
+      reflections.reverse().splice(index, 1);
+      reflections.reverse();
+      localStorage.setItem('poster_reflections_list', JSON.stringify(reflections));
+      renderReflectionRecords();
+      showNotification('Reflection entry deleted.');
+    };
+
     function clearReflections() {
       if (confirm('Clear all reflection entries?')) {
-        reflectionIds.forEach(id => {
-          const textarea = document.getElementById(id);
-          if (textarea) textarea.value = '';
-          localStorage.removeItem('poster_en_reflect_' + id);
+        ['student1','student2','student3','teacher1','teacher2','teacher3'].forEach(id => {
+          document.getElementById(id).value = '';
         });
+        localStorage.removeItem('poster_reflections_list');
+        renderReflectionRecords();
         showNotification('Reflections cleared.');
       }
     }
-    document.getElementById('saveReflectionsBtn')?.addEventListener('click', saveReflections);
+
+    document.getElementById('saveReflectionsBtn')?.addEventListener('click', saveReflectionsAppend);
     document.getElementById('resetReflectionsBtn')?.addEventListener('click', clearReflections);
 
     // ============ 页面加载 ============
     window.addEventListener('DOMContentLoaded', () => {
-      loadReflections();
       renderRecordsTable();
+      renderReflectionRecords();
     });
 
-    // 暴露函数到全局
     window.saveRecord = saveRecord;
   })();
 </script>
