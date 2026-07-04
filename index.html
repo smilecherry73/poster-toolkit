@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Medical Poster Presentation · Peer Review & Reflection Toolkit</title>
+  <!-- 引入html2pdf库用于PDF导出 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f0f3f6;
+      font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      color: #1e2b3c;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1350px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 2rem;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      color: #1e3b4a;
+      border-bottom: 4px solid #2c5f6e;
+      padding-bottom: 0.75rem;
+    }
+    h1 span {
+      background: #2c5f6e;
+      color: white;
+      font-size: 1rem;
+      padding: 0.3rem 1.2rem;
+      border-radius: 2rem;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #2d404e;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-style: italic;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button, .btn {
+      background: #ffffff;
+      border: 1px solid #b6c8d4;
+      padding: 0.6rem 1.3rem;
+      border-radius: 2.5rem;
+      font-weight: 500;
+      color: #1e3b4a;
+      cursor: pointer;
+      background: #f3f6f9;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    button:hover, .btn:hover {
+      background: #e4ecf2;
+      border-color: #2c5f6e;
+      box-shadow: 0 4px 10px rgba(44, 95, 110, 0.1);
+    }
+    .btn-primary {
+      background: #2c5f6e;
+      border-color: #2c5f6e;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1e4a57;
+    }
+    .btn-export {
+      background: #4a7c59;
+      border-color: #4a7c59;
+      color: white;
+    }
+    .btn-export:hover {
+      background: #3a6247;
+    }
+    .btn-record {
+      background: #7b5e3b;
+      border-color: #7b5e3b;
+      color: white;
+    }
+    .btn-record:hover {
+      background: #5e482d;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.8rem 0 1.5rem;
+      border-bottom: 2px solid #d0dce4;
+      padding-bottom: 0.5rem;
+    }
+    .tab {
+      background: transparent;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-weight: 600;
+      color: #3a5363;
+      border-radius: 2rem 2rem 0 0;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+    .tab.active {
+      background: #ffffff;
+      color: #1e3b4a;
+      border-bottom: 3px solid #2c5f6e;
+      font-weight: 700;
+    }
+
+    .panel {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+    .panel.active {
+      display: block;
+    }
+    @keyframes fade { from { opacity: 0.5; } to { opacity: 1; } }
+
+    .rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+      margin: 1.2rem 0;
+      font-size: 0.9rem;
+      border: 1px solid #d6e0e8;
+    }
+    .rubric-table th {
+      background: #1e404e;
+      color: white;
+      font-weight: 600;
+      padding: 0.9rem 0.8rem;
+      text-align: left;
+    }
+    .rubric-table td, .rubric-table th {
+      padding: 0.8rem;
+      border-bottom: 1px solid #dee6ed;
+      vertical-align: top;
+    }
+    .rubric-table tr:last-child td {
+      border-bottom: none;
+    }
+    .dimension {
+      font-weight: 700;
+      color: #1a3643;
+      background: #f4f8fb;
+    }
+    .score-cell {
+      background: #fafbfc;
+    }
+
+    .score-input-group {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #f9fbfd;
+      border-radius: 1rem;
+      border: 1px solid #dde5ef;
+    }
+    .score-input-group label {
+      font-weight: 600;
+      color: #1e3b4a;
+    }
+    .score-input-group select, .score-input-group input {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid #cbd7e3;
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: white;
+    }
+
+    .badge {
+      background: #e2ebf2;
+      color: #1e3b4a;
+      padding: 0.2rem 0.7rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .card {
+      background: #f9fbfd;
+      border: 1px solid #d3dfe9;
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      color: #1e404e;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .question-list {
+      list-style: none;
+    }
+    .question-list li {
+      margin-bottom: 0.65rem;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: baseline;
+    }
+    .question-list li::before {
+      content: "●";
+      color: #2c5f6e;
+      font-weight: bold;
+    }
+
+    .reflection-box {
+      background: #f6f9fc;
+      border-left: 6px solid #2c5f6e;
+      padding: 1.2rem;
+      border-radius: 0.8rem;
+      margin: 1.2rem 0;
+    }
+    .teacher-reflection {
+      background: #faf7f4;
+      border-left-color: #8b6b4d;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd7e3;
+      border-radius: 0.8rem;
+      padding: 0.9rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: #ffffff;
+      margin-top: 0.5rem;
+      resize: vertical;
+    }
+    hr {
+      margin: 2rem 0 1rem;
+      border: 0.5px solid #d4dfe8;
+    }
+    .footer-note {
+      font-size: 0.8rem;
+      color: #4a5c69;
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    /* 评分记录表 */
+    .records-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+    .records-table th {
+      background: #1e404e;
+      color: white;
+      padding: 0.6rem 0.5rem;
+    }
+    .records-table td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #dee6ed;
+      text-align: center;
+    }
+    .records-table tr:nth-child(even) td {
+      background: #f9fbfd;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2c5f6e;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.8rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+      display: none;
+    }
+    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    @media (max-width: 650px) {
+      body { padding: 1rem 0.8rem; }
+      .container { padding: 1.8rem 1rem; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="notification" id="notification"></div>
+
+<div class="container" id="main-content">
+  <h1>
+    🧬 Medical Poster Peer Review Toolkit
+    <span>Peer Review & Reflection</span>
+  </h1>
+  <div class="subtitle">
+    <span>📋 Visual Storytelling · Scientific Persuasion · Oral Translation · Delivery Basics · Audience Engagement</span>
+    <div class="toolbar">
+      <button onclick="exportToPDF()" class="btn btn-export">📄 Export PDF</button>
+      <button onclick="saveRecord()" class="btn btn-record">💾 Save Record</button>
+      <button onclick="window.print()" class="btn">🖨️ Print</button>
+      <button id="resetReflectionsBtn" class="btn">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="rubric">📊 Peer Review Rubric</button>
+    <button class="tab" data-tab="questions">❓ Reflective Questions</button>
+    <button class="tab" data-tab="interaction">🤝 Instructor Feedback</button>
+    <button class="tab" data-tab="reflection">📝 Post-Session Reflection</button>
+    <button class="tab" data-tab="records">📋 Saved Records</button>
+  </div>
+
+  <!-- Panel 1: Rubric -->
+  <div id="rubric" class="panel active">
+    <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">📌 Rapid Assessment Rubric (6 dimensions, 5 points each, total 30)</h2>
+    <p style="color: #2d4b5e; margin-bottom: 0.8rem;"><strong>⭐ Delivery Basics: Eye contact, body language, and rhetorical devices</strong></p>
+    
+    <!-- 评分输入区 -->
+    <div class="score-input-group">
+      <label>🎯 Hook & Structure:</label>
+      <select id="score-hook"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+      <label>📈 Visuals & Data:</label>
+      <select id="score-visual"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+      <label>🎤 Oral Translation:</label>
+      <select id="score-oral"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+      <label>🗣️ Delivery Basics:</label>
+      <select id="score-delivery"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+      <label>💬 Engagement:</label>
+      <select id="score-engage"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+      <label>⚖️ Compliance:</label>
+      <select id="score-compliance"><option value="">--</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+      <label>Student Name:</label>
+      <input type="text" id="student-name" placeholder="Enter name" style="width:150px;">
+      <span id="total-score-display" style="font-weight:700;color:#2c5f6e;"></span>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="rubric-table">
+        <thead> <tr><th>Dimension</th><th>Excellent (5)</th><th>Proficient (4)</th><th>Developing (3)</th><th>Beginner (1-2)</th></tr> </thead>
+        <tbody>
+          <tr><td class="dimension">🎯 Hook & Structure</td><td>Powerful hook; core message clear within 30 sec; logical flow self-evident</td><td>Clear opening; logical flow present</td><td>Generic opening; mechanical structure</td><td>No hook; logical gaps or disconnection</td></tr>
+          <tr><td class="dimension">📈 Visuals & Data</td><td>Figures legible at 1 meter; graphics-led; text concise</td><td>Adequate figures; slightly text-heavy</td><td>Blurry or cluttered figures; text dominates</td><td>No figures or dense text blocks</td></tr>
+          <tr><td class="dimension">🎤 Oral Translation</td><td>Fully extemporaneous; adds value beyond the poster</td><td>Mostly free from notes; occasional glances</td><td>Reads largely from script; limited eye contact</td><td>Reads with back to audience</td></tr>
+          <tr><td class="dimension" style="background:#f0f4f8;">🗣️ Delivery Basics</td><td>Eye contact covers entire room; open posture; effective rhetorical devices</td><td>Eye contact with key listeners; upright posture; occasional rhetoric</td><td>Eyes often return to screen; stiff or fidgety</td><td>Almost no eye contact; closed body language</td></tr>
+          <tr><td class="dimension">💬 Engagement & Adaptability</td><td>Actively invites questions; adapts explanations</td><td>Answers questions adequately; somewhat passive</td><td>One-way delivery; defensive when questioned</td><td>Avoids interaction or gives irrelevant answers</td></tr>
+          <tr><td class="dimension">⚖️ Compliance & Integrity</td><td>Proper citations; declares conflicts of interest and funder roles</td><td>Citations present with minor formatting issues</td><td>Missing citations or disclosure statements</td><td>No compliance elements whatsoever</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top: 1rem;">
+      <label><strong>📝 Quick Notes:</strong></label>
+      <textarea id="quick-notes" placeholder="Observations on strengths, areas for improvement..." rows="2"></textarea>
+    </div>
+  </div>
+
+  <!-- Panel 2: Questions -->
+  <div id="questions" class="panel">
+    <h2 style="font-size: 1.5rem;">🔍 Reflective Q&A Prompt Bank</h2>
+    <p style="color:#2d4b5e;">Use during post-presentation Q&A or as peer review card prompts.</p>
+    <div class="grid-cards">
+      <div class="card"><h3>🖼️ Visual & Structure</h3><ul class="question-list"><li>If you could keep only one figure, which would it be and why?</li><li>When viewed as a thumbnail, what information is recognized first?</li><li>Where does the eye land in the first 5 seconds? Does it match your intention?</li></ul></div>
+      <div class="card"><h3>📖 Scientific Narrative</h3><ul class="question-list"><li>Are you telling a detective story or submitting a lab report?</li><li>If an editor asked you to highlight a secondary finding, how would you reorganize?</li><li>Is your conclusion based on data or on interpretation? Is the boundary clear?</li></ul></div>
+      <div class="card"><h3>🗣️ Oral Translation</h3><ul class="question-list"><li>Whose understanding did your preview change? Was that your intended audience?</li><li>How would you explain the value of this study to a patient's family in one sentence?</li><li>Did your pace change when explaining complex figures? Intentional or nerves?</li></ul></div>
+      <div class="card"><h3>🤝 Engagement & Adaptability</h3><ul class="question-list"><li>Did any question make you feel challenged? How did you respond internally?</li><li>If the audience asked about conclusion B instead of A, what does that reveal?</li><li>Was there a moment you wanted to interrupt? What does that impulse tell you?</li></ul></div>
+      <div class="card"><h3>🎭 Delivery Reflection</h3><ul class="question-list"><li>Where did your gaze predominantly rest? How did the audience react?</li><li>Did your gestures reinforce the message or distract from it?</li><li>Which rhetorical device (analogy, repetition, etc.) was most effective?</li></ul></div>
+    </div>
+  </div>
+
+  <!-- Panel 3: Instructor Feedback -->
+  <div id="interaction" class="panel">
+    <h2 style="font-size: 1.5rem;">🧭 Instructor Feedback Entry Points & Operations</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1rem;">
+      <div class="card"><h3>📱 Concept Correction</h3><p><span class="badge">Action</span> Photograph the poster with a phone and shrink to screen size to test core visibility.</p></div>
+      <div class="card"><h3>🏷️ Title Intervention</h3><p><span class="badge">Contrast</span> Descriptive title vs. conclusion-driven title; rewrite on the spot.</p></div>
+      <div class="card"><h3>👁️ Visual Clinic</h3><p><span class="badge">Eye Exam</span> Project the poster; have the back row identify the smallest font size.</p></div>
+      <div class="card"><h3>🎙️ Oral Polishing</h3><p><span class="badge">Drill</span> Point to the figure with the laser pointer while simultaneously explaining its meaning.</p></div>
+      <div class="card"><h3>🛡️ Defensive Responding</h3><p><span class="badge">Phrasing</span> "If I understand correctly, you are asking..." — model academic dialogue.</p></div>
+      <div class="card"><h3>🎭 Delivery Intervention</h3><p><span class="badge">Eye Contact</span> Assign three audience members in different zones.<br><span class="badge">Body</span> Record video; review with sound off.</p></div>
+    </div>
+    <div style="margin-top: 1.8rem; background: #f5f8fb; border-radius: 1rem; padding: 1.2rem; border:1px solid #dde5ef;">
+      <h3 style="margin-bottom: 0.5rem;">📋 In-Class Feedback Notes</h3>
+      <textarea id="instructor-notes" placeholder="Record instructor observations..." rows="3"></textarea>
+    </div>
+  </div>
+
+  <!-- Panel 4: Reflection -->
+  <div id="reflection" class="panel">
+    <h2 style="font-size: 1.5rem;">✍️ Post-Session Reflection</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 0.5rem;">
+      <div class="reflection-box">
+        <h3>🧑‍🎓 Student Reflection</h3>
+        <label>1. What feedback on your delivery basics surprised you most?</label>
+        <textarea id="student1" placeholder="Write your reflections..."></textarea>
+        <label>2. If you could redesign, what three details would you change?</label>
+        <textarea id="student2" placeholder="Detail 1... Detail 2... Detail 3..."></textarea>
+        <label>3. Biggest takeaway regarding oral translation and rhetoric?</label>
+        <textarea id="student3" placeholder="e.g., I learned to use analogy..."></textarea>
+      </div>
+      <div class="reflection-box teacher-reflection">
+        <h3>👩‍🏫 Instructor Reflection</h3>
+        <label>1. How did students perform on delivery basics? Is focused training needed?</label>
+        <textarea id="teacher1" placeholder="e.g., Eye contact was generally weak..."></textarea>
+        <label>2. Did peer review foster attention to non-verbal communication?</label>
+        <textarea id="teacher2" placeholder="Observed changes..."></textarea>
+        <label>3. What delivery-focused exercises for next session?</label>
+        <textarea id="teacher3" placeholder="e.g., 60-second elevator pitch..."></textarea>
+      </div>
+    </div>
+    <div style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
+      <button id="saveReflectionsBtn" class="btn-primary">💾 Save Reflections (Local)</button>
+      <span style="font-size:0.8rem; color:#4a5c69;">Saved in browser only. No data uploaded.</span>
+    </div>
+  </div>
+
+  <!-- Panel 5: Saved Records -->
+  <div id="records" class="panel">
+    <h2 style="font-size: 1.5rem;">📋 Saved Assessment Records</h2>
+    <p style="color:#2d4b5e; margin-bottom:1rem;">Each record includes rubric scores, notes, and a timestamp.</p>
+    <div style="overflow-x: auto;">
+      <table class="records-table" id="records-table">
+        <thead>
+          <tr>
+            <th>Date/Time</th><th>Student</th><th>Hook</th><th>Visual</th><th>Oral</th><th>Delivery</th><th>Engage</th><th>Compliance</th><th>Total</th><th>Notes</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="records-tbody">
+          <tr><td colspan="11" style="text-align:center;color:#8a9aa8;">No records saved yet. Use "Save Record" on the Rubric tab.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:1rem; display:flex; gap:1rem;">
+      <button onclick="exportRecordsToCSV()" class="btn btn-primary">📥 Export All Records (CSV)</button>
+      <button onclick="clearAllRecords()" class="btn">🗑️ Clear All Records</button>
+    </div>
+  </div>
+
+  <hr>
+  <div class="footer-note">
+    📍 Medical Conference Poster Evaluation Framework · Academic English Classroom | Visual Storytelling · Scientific Persuasion · Oral Translation · Delivery Basics · Audience Engagement · Academic Integrity
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ============ 选项卡切换 ============
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetId = tab.getAttribute('data-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+
+    // ============ 实时计算总分 ============
+    const scoreSelects = ['score-hook', 'score-visual', 'score-oral', 'score-delivery', 'score-engage', 'score-compliance'];
+    const totalDisplay = document.getElementById('total-score-display');
+    
+    function updateTotal() {
+      let total = 0;
+      let count = 0;
+      scoreSelects.forEach(id => {
+        const val = parseInt(document.getElementById(id).value);
+        if (!isNaN(val)) { total += val; count++; }
+      });
+      if (count > 0) {
+        totalDisplay.textContent = `Total: ${total} / 30 (${count}/6 dimensions scored)`;
+      } else {
+        totalDisplay.textContent = '';
+      }
+    }
+    scoreSelects.forEach(id => {
+      document.getElementById(id).addEventListener('change', updateTotal);
+    });
+
+    // ============ 通知功能 ============
+    function showNotification(message, duration = 2500) {
+      const notif = document.getElementById('notification');
+      notif.textContent = message;
+      notif.style.display = 'block';
+      setTimeout(() => { notif.style.display = 'none'; }, duration);
+    }
+
+    // ============ 保存评分记录 ============
+    function saveRecord() {
+      const studentName = document.getElementById('student-name').value.trim() || 'Unnamed';
+      const scores = {};
+      scoreSelects.forEach(id => {
+        scores[id] = document.getElementById(id).value || '-';
+      });
+      const total = totalDisplay.textContent.replace('Total: ', '').split(' ')[0] || '-';
+      const notes = document.getElementById('quick-notes').value.trim();
+      const instructorNotes = document.getElementById('instructor-notes').value.trim();
+      const allNotes = [notes, instructorNotes ? `[Instructor: ${instructorNotes}]` : ''].filter(Boolean).join(' | ');
+      
+      const record = {
+        datetime: new Date().toLocaleString(),
+        student: studentName,
+        hook: scores['score-hook'],
+        visual: scores['score-visual'],
+        oral: scores['score-oral'],
+        delivery: scores['score-delivery'],
+        engage: scores['score-engage'],
+        compliance: scores['score-compliance'],
+        total: total,
+        notes: allNotes
+      };
+      
+      let records = JSON.parse(localStorage.getItem('poster_records') || '[]');
+      records.push(record);
+      localStorage.setItem('poster_records', JSON.stringify(records));
+      
+      showNotification('✅ Assessment record saved successfully!');
+      renderRecordsTable();
+      
+      // 清空输入
+      scoreSelects.forEach(id => document.getElementById(id).value = '');
+      document.getElementById('student-name').value = '';
+      document.getElementById('quick-notes').value = '';
+      document.getElementById('instructor-notes').value = '';
+      totalDisplay.textContent = '';
+    }
+
+    // ============ 渲染记录表格 ============
+    function renderRecordsTable() {
+      const records = JSON.parse(localStorage.getItem('poster_records') || '[]');
+      const tbody = document.getElementById('records-tbody');
+      if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#8a9aa8;">No records saved yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = records.map((r, index) => `
+        <tr>
+          <td>${r.datetime}</td>
+          <td><strong>${r.student}</strong></td>
+          <td>${r.hook}</td>
+          <td>${r.visual}</td>
+          <td>${r.oral}</td>
+          <td>${r.delivery}</td>
+          <td>${r.engage}</td>
+          <td>${r.compliance}</td>
+          <td><strong>${r.total}</strong></td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.notes}">${r.notes || '-'}</td>
+          <td><button onclick="deleteRecord(${index})" style="padding:0.3rem 0.6rem;font-size:0.75rem;">🗑️</button></td>
+        </tr>
+      `).reverse().join('');
+    }
+
+    window.deleteRecord = function(index) {
+      let records = JSON.parse(localStorage.getItem('poster_records') || '[]');
+      records.reverse().splice(index, 1);
+      records.reverse();
+      localStorage.setItem('poster_records', JSON.stringify(records));
+      renderRecordsTable();
+      showNotification('Record deleted.');
+    };
+
+    window.clearAllRecords = function() {
+      if (confirm('Delete all saved assessment records? This cannot be undone.')) {
+        localStorage.removeItem('poster_records');
+        renderRecordsTable();
+        showNotification('All records cleared.');
+      }
+    };
+
+    // ============ 导出CSV ============
+    window.exportRecordsToCSV = function() {
+      const records = JSON.parse(localStorage.getItem('poster_records') || '[]');
+      if (records.length === 0) {
+        showNotification('No records to export.');
+        return;
+      }
+      const headers = ['DateTime', 'Student', 'Hook', 'Visual', 'Oral', 'Delivery', 'Engagement', 'Compliance', 'Total', 'Notes'];
+      const csvContent = [headers.join(',')];
+      records.forEach(r => {
+        csvContent.push([
+          `"${r.datetime}"`, `"${r.student}"`, r.hook, r.visual, r.oral, r.delivery, r.engage, r.compliance, r.total, `"${(r.notes || '').replace(/"/g, '""')}"`
+        ].join(','));
+      });
+      const blob = new Blob([csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `poster-assessment-records-${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showNotification('📥 CSV exported!');
+    };
+
+    // ============ PDF导出 ============
+    window.exportToPDF = function() {
+      const element = document.getElementById('main-content');
+      const opt = {
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: `poster-peer-review-${new Date().toISOString().slice(0,10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+      html2pdf().set(opt).from(element).save().then(() => {
+        showNotification('📄 PDF exported successfully!');
+      });
+    };
+
+    // ============ 反思保存 ============
+    const reflectionIds = ['student1', 'student2', 'student3', 'teacher1', 'teacher2', 'teacher3'];
+    function loadReflections() {
+      reflectionIds.forEach(id => {
+        const saved = localStorage.getItem('poster_en_reflect_' + id);
+        if (saved !== null) {
+          const textarea = document.getElementById(id);
+          if (textarea) textarea.value = saved;
+        }
+      });
+    }
+    function saveReflections() {
+      reflectionIds.forEach(id => {
+        const textarea = document.getElementById(id);
+        if (textarea) localStorage.setItem('poster_en_reflect_' + id, textarea.value);
+      });
+      showNotification('✅ Reflections saved to browser.');
+    }
+    function clearReflections() {
+      if (confirm('Clear all reflection entries?')) {
+        reflectionIds.forEach(id => {
+          const textarea = document.getElementById(id);
+          if (textarea) textarea.value = '';
+          localStorage.removeItem('poster_en_reflect_' + id);
+        });
+        showNotification('Reflections cleared.');
+      }
+    }
+    document.getElementById('saveReflectionsBtn')?.addEventListener('click', saveReflections);
+    document.getElementById('resetReflectionsBtn')?.addEventListener('click', clearReflections);
+
+    // ============ 页面加载 ============
+    window.addEventListener('DOMContentLoaded', () => {
+      loadReflections();
+      renderRecordsTable();
+    });
+
+    // 暴露函数到全局
+    window.saveRecord = saveRecord;
+  })();
+</script>
+</body>
+</html>
